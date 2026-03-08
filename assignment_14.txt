@@ -1,0 +1,55 @@
+Codon Usage Table Generator
+================================================================================
+
+SCRIPT PURPOSE AND REQUIRED FEATURES
+-------------------------------------
+Write a bash script called codon_usage.sh that reads a FASTA file of coding
+DNA sequences and produces a codon usage frequency table. The script should:
+
+- Accept a FASTA filename as its only argument
+- Read each sequence, concatenating multi-line sequences
+- Split each sequence into non-overlapping triplets (codons) starting from
+  position 1, ignoring any trailing bases if the length is not a multiple of 3
+- Count the occurrences of each codon across all sequences
+- Print a table of each codon that appears at least once, with its count and
+  relative frequency (fraction of total codons), sorted alphabetically by
+  codon
+- Print the total number of codons analyzed
+- Exit with an error message if no argument is given or the file does not exist
+
+EXPECTED INPUT AND OUTPUT
+--------------------------
+Input: A FASTA file containing one or more coding DNA sequences.
+
+Output: A codon usage table and total count.
+
+EXAMPLE
+-------
+Given the input file cds.fa:
+
+  >gene1
+  ATGAAAGCGTGA
+  >gene2
+  ATGAAATGA
+
+Running:
+  ./codon_usage.sh cds.fa
+
+Expected output (showing only codons with nonzero counts):
+  AAA	2	0.2857
+  ATG	2	0.2857
+  GCG	1	0.1429
+  TGA	2	0.2857
+
+  Total codons: 7
+
+SUBMISSION INSTRUCTIONS
+------------------------
+1. Create a public GitHub repository for this assignment.
+2. The repository should contain:
+   - codon_usage.sh (the script, executable)
+   - README.md explaining what the script does, how to run it, and any
+     dependencies
+   - test.sh (a test script that creates sample input, runs codon_usage.sh,
+     and checks the output against expected results, reporting pass or fail)
+3. Submit the HTTPS URL of your GitHub repository.
