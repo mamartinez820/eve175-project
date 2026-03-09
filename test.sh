@@ -29,26 +29,26 @@ run_test() {
 }
 
 # Create test input files
-cat > test1.fa << 'EOF'
+cat > data/test1.fa << 'EOF'
 >gene1
 ATGAAAGCGTGA
 >gene2
 ATGAAATGA
 EOF
 
-cat > test2.fa << 'EOF'
+cat > data/test2.fa << 'EOF'
 >seq1
 ATGAAAAC
 >seq2
 TTTGG
 EOF
 
-cat > empty.fa << 'EOF'
+cat > data/empty.fa << 'EOF'
 >empty1
 
 EOF
 
-cat > bad.txt << 'EOF'
+cat > data/bad.txt << 'EOF'
 >gene1
 ATGAAA
 EOF
@@ -63,7 +63,7 @@ TGA	2	0.2857
 Total codons: 7
 EOF
 )
-run_test "normal FASTA input" "./codon_usage.sh test1.fa" "$expected1"
+run_test "normal FASTA input" "./codon_usage.sh data/test1.fa" "$expected1"
 
 # Test 2: trailing bases ignored
 expected2=$(cat << 'EOF'
@@ -74,7 +74,7 @@ TTT	1	0.3333
 Total codons: 3
 EOF
 )
-run_test "ignores trailing bases" "./codon_usage.sh test2.fa" "$expected2"
+run_test "ignores trailing bases" "./codon_usage.sh data/test2.fa" "$expected2"
 
 # Test 3: missing argument
 expected3=$(cat << 'EOF'
@@ -86,12 +86,13 @@ run_test "missing argument" "./codon_usage.sh" "$expected3"
 
 # Test 4: missing file
 expected4="Error: File 'does_not_exist.fa' does not exist."
-run_test "missing file" "./codon_usage.sh does_not_exist.fa" "$expected4"
+run_test "missing file" "./codon_usage.sh data/does_not_exist.fa" "$expected4"
 
 # Test 5: wrong extension
 expected5="Error: Input file must have a .fa or .fasta extension."
-run_test "wrong file extension" "./codon_usage.sh bad.txt" "$expected5"
+run_test "wrong file extension" "./codon_usage.sh data/bad.txt" "$expected5"
 
 # Summary
 echo "Passed: $pass_count"
 echo "Failed: $fail_count"
+	
