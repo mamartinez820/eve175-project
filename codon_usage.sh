@@ -36,7 +36,7 @@ BEGIN {
 }
 
 #Create function that counts codon per sequence
-function process_sequence(s, i, len, usable_len, codon) {
+function process_sequence(s) {
     len = length(s)
     usable_len = len - (len % 3)
 
@@ -58,14 +58,14 @@ function process_sequence(s, i, len, usable_len, codon) {
     next
 }
 
-#If the line isn't a header and is not blank, then assign that lines value to seq
+#If the line is not  a header and is not blank, then assign that lines value to seq
 NF > 0 {
     seq = seq toupper($0)
 }
 
 END {
 
-#Check if the final line didn't get processed
+#Check if the final line did not get processed
     if (seq != "") {
         process_sequence(seq)
     }
@@ -73,9 +73,11 @@ END {
 #Print codons
     for (codon in counts) {
         freq = counts[codon] / total_codons
-        printf "%s\t%d\t%.4f\n", codon, counts[codon], freq
+        printf "%s\t%d\t%.4f\n", codon, counts[codon], freq | "sort"
     }
+
+    close("sort")
 
     printf "\nTotal codons: %d\n", total_codons
 }
-' "$fasta_file" | sort
+' "$fasta_file" 
