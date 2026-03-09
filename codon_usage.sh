@@ -1,23 +1,22 @@
 #!/bin/bash
-#codon_usage.sh
-#Read a FASTA file of coding DNA sequences and produce a codon usage table.
+# codon_usage.sh
+# Read a FASTA file of coding DNA sequences and produce a codon usage table.
 
-#Exit on error, undefined vars, pipe failures
 set -euo pipefail
 
 #Check for exactly one argument
 if [ "$#" -ne 1 ]; then
-echo "Error: Please provide exactly one FASTA file." >&2
-echo "Usage: $0 <fasta_file>" >&2
-exit 1
+    echo "Error: Please provide exactly one FASTA file." >&2
+    echo "Usage: $0 <fasta_file>" >&2
+    exit 1
 fi
 
 fasta_file="$1"
 
 #Check that file exists
 if [ ! -f "$fasta_file" ]; then
-echo "Error: File '$fasta_file' does not exist." >&2
-exit 1
+    echo "Error: File '$fasta_file' does not exist." >&2
+    exit 1
 fi
 
 #Check that file has a FASTA extension
@@ -36,50 +35,42 @@ BEGIN {
     seq = ""
 }
 
-# Header line indicates a new sequence
+#Create function that counts codon per sequence
+function process_sequence(s, i, len, usable_len, codon) {
+    len = length(s)
+    usable_len = len - (len % 3)
+
+    for (i = 1; i <= usable_len; i += 3) {
+        codon = substr(s, i, 3)
+        counts[codon]++
+        total_codons++
+    }
+}
+
+#Check if line is a header line
 /^>/ {
 
-#If seq isn't empty, then count its codon befeor reseting it to a empty string
+#If line is a hedear line, if seq is not empty, then count its codons
     if (seq != "") {
-
-#Find what part of the sequence is usable (no overhangs)
-        len = length(seq)
-        usable_len = len - (len % 3)
-
-#Loop through the sequence in intervals of 3 to find codons
-        for (i = 1; i <= usable_len; i += 3) {
-            codon = substr(seq, i, 3)
-            counts[codon]++
-            total_codons++
-        }
-
-#Reset seq to a empty string 
+        process_sequence(seq)
         seq = ""
     }
     next
 }
 
-#If we are on a sequence line, add it to seq
-{
+#If the line isn't a header and is not blank, then assign that lines value to seq
+NF > 0 {
     seq = seq toupper($0)
 }
 
 END {
 
-#Process final sequence using same algorithm
+#Check if the final line didn't get processed
     if (seq != "") {
-        len = length(seq)
-        usable_len = len - (len % 3)
-
-        for (i = 1; i <= usable_len; i += 3) {
-            codon = substr(seq, i, 3)
-            counts[codon]++
-            total_codons++
-        }
+        process_sequence(seq)
     }
 
-
-#Print codons with nonzero counts
+#Print codons
     for (codon in counts) {
         freq = counts[codon] / total_codons
         printf "%s\t%d\t%.4f\n", codon, counts[codon], freq
